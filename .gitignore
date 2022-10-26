@@ -1,0 +1,26 @@
+/node_modules
+/dist
+/*.tgz
+/.next
+/.vercel
+.vercel
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+# Project dependencies
+# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+node_modules
+.DS_Store
+.vscode
+# Intellij IDEs
+.idea/*
+.idea
+**/.idea
+.vercel
+.next
+sitemap.xml
+content/docs/example-scripts/
+.env
+.env.local

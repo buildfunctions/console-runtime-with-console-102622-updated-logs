@@ -1,0 +1,83 @@
+import useSWR from "swr"
+import React, { useRef, useState } from 'react'
+import Router from 'next/router'
+import initialStore from "../../../lib/store";
+import styles from "../../styles/console-input.module.css";
+import InlineCodeBlock from '../../components/Blocks/MDX.InlineCodeBlock'
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
+export default function ConsoleStatus() {
+  // add button
+  const [state, setState] = useState(<span className="info">&nbsp;</span>)
+    const [text, setText] = useState('')
+    const { data } = useSWR("globalState", { fallbackData: initialStore })
+    if (!data) {
+        return null
+    }
+
+  return (
+    <>
+      {/* <span className="flex flex-justify-center text-center text-gray-900 ml-8">{text}</span> */}
+      <form className="flex flex-grow justify-center bg-gray-300 bg-opacity-75 rounded pt-1 m-4">
+        <div className="flex flex-grow justify-center">
+            
+         
+          <div className="relative flex-col justify-center w-full px-3 py-1">
+
+             
+
+            <div className="flex flex-col justify-center pl-20 pr-20">
+             
+            </div>
+
+              <b className='flex flex-row justify-start mb-2 mt-2 ml-1 text-white'>#!bin/bash </b>
+              <InlineCodeBlock width='720' height='239' className='max-w-full'>
+                <textarea 
+                  id="message" 
+                  rows="28" 
+                  className="rounded form-text area w-full bg-black border border-gray-400 focus:border-white text-violet-600 dark:text-gold-100 pl-2 pt-2 pb-2" 
+                  placeholder="$"
+                  // value={text}
+                  onChange={e => setText(e.target.value)}
+                  autoFocus>
+                </textarea>
+              </InlineCodeBlock>
+                <br />
+                <div className="flex flex-row justify-left w-full px-3 py-3 pl-4 text-base text-white">
+                  
+                  {/* add button */}
+                  
+                  <div className="leading-tight btn-sm focus:bg-gray-700 flex-container justify-center border-shadowed border-white text-base font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 ">
+                <button
+                   type="button" 
+                   onClick={() => Router.push('/logs')}
+                >
+                    Build
+                </button>
+                
+            </div>
+            <div className="flex flex-grow justify-center">
+                <span className="pt-4 flex flex-grow justify-center text-center">
+                    {state}
+                </span>
+            </div>
+
+                {/* project name input */}
+                <div className="flex-grow inline-flex justify-center items-center px-4 pl-3p">
+                  {/* <SearchLogo size={35} className="flex flex-grow justify-center pr-3 py-1 mr-2 bg-transparent cursor-pointer" onClick={handleFocus} /> */}
+                  <input
+                    placeholder="Choose your project name..."
+                    className="justify-center text-gray-200 bg-gray-600 w-full py-2 px-3 leading-tight rounded outline-2 focus:shadow-outline focus:bg-gray-700 focus:ring-1 focus:ring-purple-300 focus:text-indigo-50"
+                    aria-label="Choose your project name"
+                  />
+                  
+                </div>
+              </div>
+             
+          
+          </div>
+        </div>
+      </form>
+    </>
+  )
+}

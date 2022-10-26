@@ -1,0 +1,245 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import 'mdx';
+@import 'fonts';
+@import 'forms';
+@import 'icons';
+@import 'links';
+@import 'tables';
+@import 'theme';
+@import 'docsearch';
+@import '404';
+
+body {
+  @apply text-base;
+  @apply text-primary;
+  @apply bg-primary;
+  @apply antialiased;
+
+}
+
+/* These summary rules need to be separate like this, otherwise FF won't work right. */
+summary {
+  @apply list-none;
+}
+
+summary::marker {
+  @apply hidden;
+}
+
+summary::-webkit-details-marker {
+  @apply hidden;
+}
+
+b,
+strong {
+  @apply font-semibold;
+}
+
+.algolia-autocomplete {
+  @apply w-full;
+}
+
+/*
+ *
+ * If you're thinking about putting styles here, please don't without checking
+ * with Jason or Derek. Styles should almost always go in the component or in a
+ * cooresponding CSS module.
+ *
+ */
+
+
+
+.directory-divide-y > li:not(:last-child):after {
+  content: '';
+  display: block;
+  width: calc(100% - 24px);
+  transform: translateX(24px);
+  height: 1px;
+  background: #333333;
+}
+
+@layer components {
+  .button {
+   @layer @apply px-2 py-2 border rounded-full cursor-pointer
+      hover:shadow-lg active:bg-gray-100 transition
+      transform duration-200 ease-out;
+  }
+}
+
+@layer utilities {
+  .overflow-hidden {
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+  }
+}
+
+html { 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-color: #C0C0C6;
+  opacity: .80;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1; /* Or flex-grow: 1;*/
+}
+
+.rtl {
+  direction: rtl;
+}
+
+
+[x-cloak] {
+  display: none;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: left;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+}
+
+.countries-list {
+  max-width: 500px;
+}
+
+.country-item {
+  display: flex;
+  margin: 3px 0;
+  align-items: center;
+  padding: 3px 10px;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.country-item.saved {
+  background: #ccc6ec;
+}
+
+.country-item.dark {
+  background: #151515;
+  color: #fff;
+}
+
+.country-item:focus,
+.country-item:active {
+  background: #c1f0f9;
+}
+
+.country-same-region {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.selected-container {
+  display: flex;
+  width: 50%;
+  align-items: flex-start;
+}
+
+.selected-info {
+  flex-grow: 1;
+}
+
+.selected-button {
+  padding: 10px 20px;
+  background: #00875a;
+  color: #fff;
+  border: 0;
+}
+
+.selected-flag {
+  width: 150px;
+}
+
+.container {
+  padding: 4rem 1rem;
+  max-width: 50rem;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container h1 {
+  font-weight: 800;
+}
+
+.container p {
+  margin: 1.5rem 0;
+  line-height: 1.5;
+}
+
+.container button {
+  border-radius: 4px;
+  height: 40px;
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  border: none;
+  transition: 0.25s all ease;
+  background-color: #eaeaea;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+.container button:hover {
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+}
+
+.container a {
+  text-decoration: none;
+  color: #0070f3;
+}
+
+.inlineCode {
+  color: #be00ff;
+  font-size: 16px;
+  white-space: pre-wrap;
+}
+
+.inlineCode::before,
+.inlineCode::after {
+  content: '`';
+}
+
+.code {
+  margin-top: 16px;
+  display: block;
+  background: #222222;
+  border-radius: 8px;
+  padding: 16px;
+  color: white;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.links {
+  margin-top: 16px;
+  color: #9c9c9c;
+}

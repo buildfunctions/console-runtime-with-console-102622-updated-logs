@@ -1,0 +1,360 @@
+import { useRouter } from 'next/router'
+import useSWR from 'swr'
+// import { Layout } from '../comp
+import Image from 'next/image';onents/Layout'
+import fetchAPI from '../../lib/fetch-api'
+// import ApiRequest from '../components/api-request'
+import TokenButton from '../components/tokenbutton'
+import Code from '../components/Code'
+// import { USER_TOKEN } from '../lib/constants'
+import Link from 'next/link';
+import dbConnect from '../../lib/dbConnect'
+import Demo from '../models/Demo'
+import Form from '../components/Form'
+import {FieldValues, useForm, UseFormRegister} from "react-hook-form";
+import {ToastContainer, toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import React, {useState, useEffect} from "react";
+// import {useUnsavedChanges} from "./useUnsavedChanges";
+
+const Loading = () => <div>Loading...</div>;
+
+const fetcher = (url) => fetch(url).then(r => r.json())
+
+async function saveFormData(data, url) {
+    return await fetch(url, {
+        body: JSON.stringify(data),
+        headers: {"Content-Type": "application/json"},
+           // headers: { Authorization: `Bearer ${token}` },
+        method: "POST"
+    })
+}
+
+const RateLimit = ({ key, token, demos, register, errors, isSubmitting}) => {
+  const [loading, setLoading] = useState(false)
+  const [selectedKey, setKey] = useState('')
+  const { data, error, mutate } = useSWR('/api/keys')
+  const apiKeys = data?.apiKeys
+
+
+  const issuedDate = new Date();
+  const userUsernamePlaceholder = "projectmikey"
+  
+    const fields = [
+          {type: "text", name: "function_value", required: false, label: "function_value"},
+          {type: "text", name: "function_name", required: false, label: "function_name"},
+          // {type: "date", name: "token_expire_date", required: true, label: "token_expire_date"},
+          // {type: "hidden", name: "token_issue_date", required: true, label: "token_issue_date", value: (new Date())},
+          {type: "hidden", name: "user_username", required: true, label: "user_username", value: userUsernamePlaceholder},
+        ]
+
+    const renderForm = ({apiKeys, register, errors, isSubmitting}) => {
+        return <>
+            {fields.map(field => {
+                return (
+                    <>
+                        <label htmlFor={field.name}>{field.label}</label>
+                        <input type={field.type} autoComplete={field.autoComplete} placeholder={field.placeholder} value={field.value}
+                                {...register(field.name, {required: field.required})} />
+                        <div className="error">{errors[field.name]?.message}</div>
+                    </>
+                )
+            })}
+
+            <button disabled={isSubmitting}>
+                {isSubmitting ? <Loading/> : "Submit"}
+            </button>
+        </>
+    }
+  return (
+    <div>
+      {/* <span className="text-center mb-6">
+       {USER_TOKEN}
+      </span> */}
+
+      <ApiRequest token={selectedKey} />
+
+      <div className="grid">
+        {apiKeys ? (
+          apiKeys.length ? (
+            <ul className="border-accents-2 border rounded-md bg-white divide-y divide-accents-2 my-6">
+              {apiKeys.map(([key, { limit, timeframe }]) => (
+                <li key={key} className="flex items-center justify-content p-6">
+                  <span className="flex-1 mr-4 sm:mr-8">
+                    <h3 className="text-sm font-semibold text-black break-all">
+                      {key}
+                    </h3>
+                    <p className="font-medium text-accents-4">
+                      {limit}req/{timeframe}s
+                    </p>
+                  </span>
+                  <span className="flex justify-end flex-col sm:flex-row">
+                    <TokenButton
+                      className="mb-2 sm:mr-2 sm:mb-0"
+                      onClick={() => setKey(selectedKey === key ? '' : key)}
+                      size="sm"
+                      variant={selectedKey === key ? 'primary' : 'secondary'}
+                    >
+                      Use this key
+                    </TokenButton>
+                    <TokenButton
+                      onClick={async () => {
+                        await fetchAPI(`/keys?key=${key}`, { method: 'DELETE' })
+                        await mutate()
+                      }}
+                      size="sm"
+                      variant="secondary"
+                    >
+                      Remove
+                    </TokenButton>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null
+        ) : error ? (
+          <div>Failed to load API Keys</div>
+        ) : (
+          <div>Loading API Keys...</div>
+        )}
+
+        <TokenButton
+          type="button"
+          className="sm:w-44 sm:justify-self-end"
+          onClick={async () => {
+            setLoading(true)
+            await fetchAPI('/keys', { method: 'PUT' }).finally(() => {
+              setLoading(false)
+            })
+            await mutate()
+          }}
+          loading={loading}
+        >
+          Add new API Key with console log token write to json
+        </TokenButton>
+        <TokenButton
+          onClick={() => {
+            fetch('/api/token', { method: 'POST' })
+          }}
+        >
+          Set the cookie
+        </TokenButton>
+      </div>
+
+      <div>
+        <FormComponent url="/api/demos" renderForm={renderForm} />
+    
+        <>
+          {demos.map((demo) => (
+            <div key={demo._id}>
+              <div className="card">
+                <Image src={demo.image_url} />
+                <div className="main-content">
+                  <p>function_value: {demo.function_value}</p>
+                  <p>user_username: {demo.user_username}</p>
+                  <p>function_name: {demo.function_name}</p>
+                  <div className="btn-container">
+                    <Link href="/[id]/edit" as={`/${demo._id}/edit`}>
+                      <button className="btn edit">Edit</button>
+                    </Link>
+                    <Link href="/[id]" as={`/${demo._id}`}>
+                      <button className="btn view">View</button>
+                    </Link>
+                    <br />
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          ))}
+        </>
+      </div>
+      {apiKeys ? (
+          apiKeys.length ? (
+            // <ul className="border-accents-2 border rounded-md bg-white divide-y divide-accents-2 my-6">
+            //   {apiKeys.map(([key, { limit, timeframe }]) => (
+                <li key={key} className="flex items-center justify-content p-6">{key}</li>
+              // ))}
+            // </ul>
+          ) : null
+        ) : error ? (
+          <div>Failed to load API Keys</div>
+        ) : (
+          <div>Loading API Keys...</div>
+        )}
+    </div>
+  )
+}
+
+// RateLimit.Layout = Layout
+
+const newUrl = '/api/ping'
+ /* The POST method adds a new entry in the mongodb database. */
+
+
+function fetchDemo(key) {
+  if (!key) return `const res = await fetch(${newUrl})`
+  return `const res = await fetch(${newUrl}, {
+  headers: {
+    Authorization: 'Bearer ${key}'
+  }
+})`
+}
+
+const ApiRequest = ({ token }) => {
+  const [loading, setLoading] = useState(false)
+  const [state, setState] = useState({
+    latency: null,
+    status: null,
+    headers: {
+      'X-upstash-latency': '',
+      'X-RateLimit-Limit': '',
+      'X-RateLimit-Remaining': '',
+      'X-RateLimit-Reset': '',
+    },
+    data: { done: false },
+  })
+  const handleFetch = async () => {
+    const start = Date.now()
+    setLoading(true)
+
+    try {
+      const res = await fetch(
+       `${newUrl}`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      )
+      setState({
+        latency: `~${Math.round(Date.now() - start)}ms`,
+        status: `${res.status}`,
+        headers: {
+          'X-upstash-latency': `${res.headers.get('X-upstash-latency')}ms`,
+          'X-RateLimit-Limit': res.headers.get('X-RateLimit-Limit'),
+          'X-RateLimit-Remaining': res.headers.get('x-RateLimit-Remaining'),
+          'X-RateLimit-Reset': res.headers.get('x-RateLimit-Reset'),
+        },
+        data: res.headers.get('Content-Type')?.includes('application/json')
+          ? await res.json()
+          : null,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="grid">
+      <pre className="border-accents-2 border rounded-md bg-white overflow-x-auto p-6 mb-2">
+        {fetchDemo(token)}
+      </pre>
+      <pre
+        className={`border-accents-2 border rounded-md bg-white overflow-x-auto p-6 mb-4 transition-all${
+          loading ? ' opacity-50' : ''
+        }`}
+      >
+        {JSON.stringify(state, null, 2)}
+      </pre>
+      <div className="grid gap-4 items-center justify-center sm:justify-between sm:grid-flow-col">
+    
+        <TokenButton
+          type="button"
+          className="sm:w-40"
+          onClick={handleFetch}
+          loading={loading}
+        >
+          Make a request
+        </TokenButton>
+      </div>
+    </div>
+  )
+}
+
+function FormComponent({url, renderForm}) {
+  // Fetch our initial form data
+  const {data, error} = useSWR(url, fetcher)
+  const {register, reset, handleSubmit, setError, formState: {isSubmitting, errors, isDirty}} = useForm();
+
+  // Confirm redirects when isDirty is true
+  useConfirmRedirectIfDirty(isDirty)
+
+  // Submit handler which displays errors + success messages to the user
+  const onSubmit = async (data) => {
+      const response = await saveFormData(data, url)
+
+      if (response.status === 400) {
+          // Validation error, expect response to be a JSON response {"field": "error message for that field"}
+          const fieldToErrorMessage = await response.json()
+          for (const [fieldName, errorMessage] of Object.entries(fieldToErrorMessage)) {
+              setError(fieldName, {type: 'custom', message: errorMessage})
+          }
+      } else if (response.ok) {
+          // successful
+          toast.success("Successfully saved")
+      } else {
+          // unknown error
+          toast.error("An unexpected error occurred while saving, please try again")
+      }
+  }
+
+  // Sets the default value of the form once it's available
+  useEffect(() => {
+      if (data === undefined) {
+          return; // loading
+      }
+      reset(data);
+  }, [reset, data]);
+
+  // Handle errors + loading state
+  if (error) {
+      return <div>An unexpected error occurred while loading, please try again</div>
+  } else if (!data) {
+      return <div>Loading...</div>
+  }
+
+  // Finally, render the form itself
+  return <form onSubmit={handleSubmit(onSubmit)}>
+      {renderForm({register, errors, isSubmitting})}
+      <ToastContainer position="bottom-center"/>
+  </form>;
+}
+
+function useConfirmRedirectIfDirty(isDirty) {
+  const router = useRouter()
+
+  // prompt the user if they try and leave with unsaved changes
+  useEffect(() => {
+      const warningText = 'You have unsaved changes - are you sure you wish to leave this page?';
+      const handleWindowClose = (e) => {
+          if (!isDirty) return;
+          e.preventDefault();
+          return (e.returnValue = warningText);
+      };
+      const handleBrowseAway = () => {
+          if (!isDirty) return;
+          if (window.confirm(warningText)) return;
+          router.events.emit('routeChangeError');
+          throw 'routeChange aborted.';
+      };
+      window.addEventListener('beforeunload', handleWindowClose);
+      router.events.on('routeChangeStart', handleBrowseAway);
+      return () => {
+          window.removeEventListener('beforeunload', handleWindowClose);
+          router.events.off('routeChangeStart', handleBrowseAway);
+      };
+  }, [isDirty]);
+}
+
+export async function getServerSideProps() {
+  
+  await dbConnect()
+  
+  const result = await Demo.find({})
+  const demos = result.map((doc) => {
+    const demo = doc.toObject()
+    demo._id = demo._id.toString()
+    return demo
+  })
+
+  return { props: { demos: demos } }
+}
+
+export default RateLimit
